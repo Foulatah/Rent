@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927982105536",
+    "project_id": "foulatah-6e23e",
+    "storage_bucket": "foulatah-6e23e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927982105536:android:733f2d979dbbe5ef940e25",
+        "android_client_info": {
+          "package_name": "com.foulatah.foulatah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAclk5kSgr_i9GWn95ylNI3swkizPo085E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
