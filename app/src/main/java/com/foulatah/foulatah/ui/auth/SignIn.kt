@@ -3,12 +3,16 @@ package com.foulatah.foulatah.ui.auth
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -22,6 +26,7 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     BackHandler {
         navController.popBackStack()
@@ -44,7 +49,8 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email", color = Color.White) },
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon", tint = Color.White) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -53,8 +59,9 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password", color = Color.White) },
-                visualTransformation = PasswordVisualTransformation(),
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password Icon", tint = Color.White) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -84,6 +91,8 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
                 ) {
                     Text("Login", color = Color.White)
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     modifier = Modifier.clickable {

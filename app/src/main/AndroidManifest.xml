@@ -15,6 +15,11 @@
         android:theme="@style/Theme.Foulatah"
         tools:targetApi="31">
         <activity
+            android:name=".ui.agreement.agreement"
+            android:exported="false"
+            android:label="@string/title_activity_agreement"
+            android:theme="@style/Theme.Foulatah" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Foulatah">

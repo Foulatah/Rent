@@ -3,6 +3,9 @@ package com.foulatah.foulatah.ui.auth
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,6 +27,8 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
     var confirmPassword by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -42,7 +48,8 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email", color = Color.White) },
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon", tint = Color.White) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -51,8 +58,9 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password", color = Color.White) },
-                visualTransformation = PasswordVisualTransformation(),
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password Icon", tint = Color.White) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -61,8 +69,9 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 label = { Text("Confirm Password", color = Color.White) },
-                visualTransformation = PasswordVisualTransformation(),
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
+                visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password Icon", tint = Color.White) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -73,23 +82,21 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                     onClick = {
-                        if (email.isBlank()) {
-                            error = "Email is required"
-                        } else if (password.isBlank()) {
-                            error = "Password is required"
-                        } else if (confirmPassword.isBlank()) {
-                            error = "Password Confirmation required"
-                        } else if (password != confirmPassword) {
-                            error = "Passwords do not match"
-                        } else {
-                            isLoading = true
-                            signUp(email, password, {
-                                isLoading = false
-                                Toast.makeText(context, "Sign-up successful!", Toast.LENGTH_SHORT).show()
-                                onSignUpSuccess()
-                            }) { errorMessage ->
-                                isLoading = false
-                                error = errorMessage
+                        when {
+                            email.isBlank() -> error = "Email is required"
+                            password.isBlank() -> error = "Password is required"
+                            confirmPassword.isBlank() -> error = "Password confirmation is required"
+                            password != confirmPassword -> error = "Passwords do not match"
+                            else -> {
+                                isLoading = true
+                                signUp(email, password, {
+                                    isLoading = false
+                                    Toast.makeText(context, "Sign-up successful!", Toast.LENGTH_SHORT).show()
+                                    onSignUpSuccess()
+                                }) { errorMessage ->
+                                    isLoading = false
+                                    error = errorMessage
+                                }
                             }
                         }
                     },
@@ -97,6 +104,8 @@ fun SignUpScreen(navController: NavController, onSignUpSuccess: () -> Unit) {
                 ) {
                     Text("Sign Up", color = Color.White)
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     modifier = Modifier.clickable {

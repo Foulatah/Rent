@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PaneRentals</string>
+    <string name="title_activity_agreement">agreement</string>
 </resources>

@@ -11,8 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -87,7 +85,7 @@ fun DashboardScreen(navController: NavHostController) {
                 ),
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(ROUTE_HOME) }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back Icon", tint = Color.White)
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back Icon", tint = Color.White)
                     }
                 },
             )
@@ -96,15 +94,12 @@ fun DashboardScreen(navController: NavHostController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White),
+                    .background(Color.LightGray),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Dashboard starts here
-
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 val dashboardItems = listOf(
-
                     DashboardItemData(
                         title = "Complaints",
                         icon = Icons.Filled.Email,
@@ -131,22 +126,29 @@ fun DashboardScreen(navController: NavHostController) {
                     ),
                     DashboardItemData(
                         title = "Bills",
-                        icon = Icons.Filled.Info,
+                        icon = Icons.Filled.AddCircle,
                         badgeCount = 4,
                         onClick = { navController.navigate(ROUTE_UPDATE_BILLS) }
+                    ),
+                    DashboardItemData(
+                        title = "Lease",
+                        icon = Icons.Filled.Info,
+                        badgeCount = 4,
+                        onClick = { navController.navigate(ROUTE_AGREEMENT) }
                     ),
                 )
 
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(1),
-                    modifier = Modifier.padding(16.dp)
+                    columns = GridCells.Fixed(1), // Adjust grid cells count for better layout
+                    modifier = Modifier.padding(16.dp),
+                    contentPadding = PaddingValues(8.dp)
                 ) {
                     items(dashboardItems) { item ->
                         DashboardItem(item)
                     }
                 }
 
-                // Dashboard ends here
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     )
@@ -159,8 +161,9 @@ fun DashboardItem(item: DashboardItemData) {
             .fillMaxWidth()
             .padding(8.dp),
         onClick = item.onClick,
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Row(
             modifier = Modifier
@@ -180,6 +183,7 @@ fun DashboardItem(item: DashboardItemData) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black
             )
+            Spacer(modifier = Modifier.weight(1f))
             if (item.badgeCount > 0) {
                 Badge(count = item.badgeCount)
             }
@@ -192,7 +196,7 @@ fun Badge(count: Int) {
     Box(
         modifier = Modifier
             .padding(start = 8.dp)
-            .size(20.dp)
+            .size(24.dp)
             .clip(CircleShape)
             .background(Color.Red),
         contentAlignment = Alignment.Center

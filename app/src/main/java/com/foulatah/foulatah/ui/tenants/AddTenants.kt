@@ -1,5 +1,3 @@
-package com.foulatah.foulatah.ui.tenants
-
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
@@ -31,11 +29,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 import java.util.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.foulatah.foulatah.navigation.ROUTE_ADD_TENANTS
-import com.foulatah.foulatah.ui.home.HomeScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +79,6 @@ fun AddTenantDetailsScreen(navController: NavController, onTenantAdded: () -> Un
             Spacer(modifier = Modifier.height(16.dp))
         },
 
-
         content = {
             LazyColumn(
                 modifier = Modifier
@@ -118,7 +110,7 @@ fun AddTenantDetailsScreen(navController: NavController, onTenantAdded: () -> Un
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = { launcher.launch("image/*") },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                     ) {
                         Text("Select Photo")
                     }
@@ -198,7 +190,6 @@ fun AddTenantDetailsScreen(navController: NavController, onTenantAdded: () -> Un
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-
                     Button(
                         onClick = {
                             tenantNameError = tenantName.isBlank()
@@ -221,7 +212,7 @@ fun AddTenantDetailsScreen(navController: NavController, onTenantAdded: () -> Un
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                     ) {
                         Text("Add Tenant")
                     }
@@ -230,8 +221,6 @@ fun AddTenantDetailsScreen(navController: NavController, onTenantAdded: () -> Un
         }
     )
 }
-
-
 
 private fun addTenantToFirestore(
     navController: NavController,
@@ -267,9 +256,9 @@ private fun addTenantToFirestore(
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        // Navigate to Home screen with house number
-                        navController.navigate("home/${tenantHouseNumber}") {
-                            popUpTo("home") { inclusive = true }
+                        // Navigate to ViewTenants screen
+                        navController.navigate(ROUTE_VIEW_TENANTS) {
+                            popUpTo(ROUTE_VIEW_TENANTS) { inclusive = true }
                         }
 
                         // Invoke the onTenantAdded callback
@@ -294,7 +283,6 @@ private fun addTenantToFirestore(
             ).show()
         }
 }
-
 
 private fun uploadPhotoToStorage(
     navController: NavController,

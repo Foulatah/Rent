@@ -1,5 +1,7 @@
 package com.foulatah.foulatah.ui.tenants
 
+import Bill
+import Tenant
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -23,7 +25,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.foulatah.foulatah.navigation.ROUTE_VIEW_BILLS
 import com.foulatah.foulatah.navigation.ROUTE_VIEW_TENANTS
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.tasks.await
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +72,6 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                     titleContentColor = Color.White,
                 )
             )
-
         },
 
         content = {
@@ -76,53 +80,81 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                     .fillMaxSize()
                     .background(Color.White)
                     .padding(16.dp),
-            ) { Spacer(modifier = Modifier.height(80.dp))
+            ) {
+                Spacer(modifier = Modifier.height(80.dp))
                 TextField(
                     value = rent,
                     onValueChange = { rent = it },
                     label = { Text("Rent") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    modifier = Modifier
                 )
+                if (rentError) {
+                    Text("Rent is required", color = Color.Red)
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 TextField(
                     value = arrears,
                     onValueChange = { arrears = it },
                     label = { Text("Arrears") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    modifier = Modifier
                 )
+                if (arrearsError) {
+                    Text("Arrears is required", color = Color.Red)
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 TextField(
                     value = garbage,
                     onValueChange = { garbage = it },
                     label = { Text("Garbage") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    modifier = Modifier
                 )
+                if (garbageError) {
+                    Text("Garbage is required", color = Color.Red)
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 TextField(
                     value = water,
                     onValueChange = { water = it },
                     label = { Text("Water") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
-                    modifier = Modifier.fillMaxWidth()
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    modifier = Modifier
+
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (rentError) {
-                    Text("Rent is required", color = Color.Red)
-                }
-                if (arrearsError) {
-                    Text("Arrears is required", color = Color.Red)
-                }
-                if (garbageError) {
-                    Text("Garbage is required", color = Color.Red)
-                }
                 if (waterError) {
                     Text("Water is required", color = Color.Red)
                 }
@@ -147,7 +179,8 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                             )
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                 ) {
                     Text("Update Bills")
                 }
@@ -181,4 +214,28 @@ private fun updateBillsInFirestore(navController: NavController, tenantId: Strin
         .addOnFailureListener {
             // Handle error updating bills in Firestore
         }
+}
+suspend fun fetchTenantWithHouseNumber(houseNumber: String): Pair<Tenant, List<Bill>> {
+    val validHouseNumbers = listOf("A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4", "D1", "D2", "D3", "D4", "E1", "E2", "E3", "E4")
+
+    if (!validHouseNumbers.contains(houseNumber)) {
+        throw IllegalArgumentException("Invalid house number")
+    }
+
+    val firestore = Firebase.firestore
+
+    val tenantQuerySnapshot = firestore.collection("tenants")
+        .whereEqualTo("houseNumber", houseNumber)
+        .get().await()
+
+    val tenantDocument = tenantQuerySnapshot.documents.firstOrNull()
+    val tenant = tenantDocument?.toObject(Tenant::class.java)
+
+    val billsQuerySnapshot = firestore.collection("bills")
+        .whereEqualTo("tenantId", tenant?.id)
+        .get().await()
+
+    val bills = billsQuerySnapshot.documents.map { it.toObject(Bill::class.java)!! }
+
+    return Pair(tenant!!, bills)
 }

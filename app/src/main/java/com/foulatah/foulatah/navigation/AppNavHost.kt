@@ -1,5 +1,9 @@
 package com.foulatah.foulatah.navigation
 
+import AddTenantDetailsScreen
+import AgreementScreen
+import PaymentScreen
+import ViewTenantScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,10 +17,8 @@ import com.foulatah.foulatah.ui.complaints.ComplaintsScreen
 import com.foulatah.foulatah.ui.dashboard.DashboardScreen
 import com.foulatah.foulatah.ui.home.HomeScreen
 import com.foulatah.foulatah.ui.suggestions.SuggestionScreen
-import com.foulatah.foulatah.ui.tenants.AddTenantDetailsScreen
-import com.foulatah.foulatah.ui.tenants.PaymentScreen
 import com.foulatah.foulatah.ui.tenants.UpdateBillsScreen
-import com.foulatah.foulatah.ui.tenants.ViewTenantScreen
+
 
 @Composable
 fun AppNavHost(
@@ -44,7 +46,12 @@ fun AppNavHost(
 
 
         composable(ROUTE_VIEW_BILLS) {
-            ViewTenantScreen(navController = navController) {}
+            ViewTenantScreen(navController = navController){}
+
+        }
+
+        composable(ROUTE_AGREEMENT) {
+            AgreementScreen(navController = navController){}
 
         }
 
