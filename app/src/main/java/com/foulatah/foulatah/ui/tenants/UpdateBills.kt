@@ -6,8 +6,10 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -23,11 +25,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.foulatah.foulatah.navigation.ROUTE_DASHBOARD
 import com.foulatah.foulatah.navigation.ROUTE_VIEW_BILLS
 import com.foulatah.foulatah.navigation.ROUTE_VIEW_TENANTS
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -35,16 +38,21 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
 
+    var houseNumber by remember { mutableStateOf("") }
     var rent by remember { mutableStateOf("") }
     var arrears by remember { mutableStateOf("") }
     var garbage by remember { mutableStateOf("") }
     var water by remember { mutableStateOf("") }
 
     // Track if fields are empty
+    var houseNumberError by remember { mutableStateOf(false) }
     var rentError by remember { mutableStateOf(false) }
     var arrearsError by remember { mutableStateOf(false) }
     var garbageError by remember { mutableStateOf(false) }
     var waterError by remember { mutableStateOf(false) }
+
+    // Track the total
+    var total by remember { mutableStateOf<Double?>(null) }
 
     Scaffold(
         topBar = {
@@ -58,7 +66,7 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(ROUTE_VIEW_BILLS)
+                        navController.navigate(ROUTE_DASHBOARD)
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -79,9 +87,30 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(90.dp))
+
+                TextField(
+                    value = houseNumber,
+                    onValueChange = { houseNumber = it },
+                    label = { Text("House Number") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    modifier = Modifier
+                )
+                if (houseNumberError) {
+                    Text("House Number is required", color = Color.Red)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 TextField(
                     value = rent,
                     onValueChange = { rent = it },
@@ -151,7 +180,6 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                         unfocusedIndicatorColor = Color.Gray
                     ),
                     modifier = Modifier
-
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -162,16 +190,18 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                 Button(
                     onClick = {
                         // Reset error flags
+                        houseNumberError = houseNumber.isBlank()
                         rentError = rent.isBlank()
                         arrearsError = arrears.isBlank()
                         garbageError = garbage.isBlank()
                         waterError = water.isBlank()
 
                         // Update bills if all fields are filled
-                        if (!rentError && !arrearsError && !garbageError && !waterError) {
+                        if (!houseNumberError && !rentError && !arrearsError && !garbageError && !waterError) {
+                            total = rent.toDouble() + arrears.toDouble() + garbage.toDouble() + water.toDouble()
                             updateBillsInFirestore(
                                 navController,
-                                tenantId.toString(),
+                                houseNumber,
                                 rent.toDouble(),
                                 arrears.toDouble(),
                                 garbage.toDouble(),
@@ -184,21 +214,32 @@ fun UpdateBillsScreen(navController: NavController, tenantId: () -> Unit) {
                 ) {
                     Text("Update Bills")
                 }
+
+                // Display the total if it's not null
+                total?.let {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Total: $it",
+                        fontSize = 24.sp,
+                        color = Color.Black
+                    )
+                }
             }
         }
     )
 }
 
-private fun updateBillsInFirestore(navController: NavController, tenantId: String, rent: Double, arrears: Double, garbage: Double, water: Double) {
+private fun updateBillsInFirestore(navController: NavController, houseNumber: String, rent: Double, arrears: Double, garbage: Double, water: Double) {
     val firestore = FirebaseFirestore.getInstance()
     val billsData = hashMapOf(
+        "houseNumber" to houseNumber,
         "rent" to rent,
         "arrears" to arrears,
         "garbage" to garbage,
         "water" to water
     )
 
-    firestore.collection("bills").document(tenantId)
+    firestore.collection("bills").document(houseNumber)
         .set(billsData)
         .addOnSuccessListener {
             // Display toast message
@@ -215,6 +256,7 @@ private fun updateBillsInFirestore(navController: NavController, tenantId: Strin
             // Handle error updating bills in Firestore
         }
 }
+
 suspend fun fetchTenantWithHouseNumber(houseNumber: String): Pair<Tenant, List<Bill>> {
     val validHouseNumbers = listOf("A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4", "D1", "D2", "D3", "D4", "E1", "E2", "E3", "E4")
 
@@ -232,7 +274,7 @@ suspend fun fetchTenantWithHouseNumber(houseNumber: String): Pair<Tenant, List<B
     val tenant = tenantDocument?.toObject(Tenant::class.java)
 
     val billsQuerySnapshot = firestore.collection("bills")
-        .whereEqualTo("tenantId", tenant?.id)
+        .whereEqualTo("houseNumber", houseNumber)
         .get().await()
 
     val bills = billsQuerySnapshot.documents.map { it.toObject(Bill::class.java)!! }

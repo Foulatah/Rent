@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.foulatah.foulatah.navigation.ROUTE_DASHBOARD
 
@@ -53,8 +54,8 @@ fun AboutScreen(navController: NavHostController) {
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = Color.DarkGray,
+                    titleContentColor = Color.White
                 )
             )
         },
@@ -64,11 +65,20 @@ fun AboutScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(paddingValues)
                     .padding(16.dp)
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(Color.White)
             ) {
                 Text(
                     text = "Pane Rentals is a premier service provider offering exceptional rental properties with a commitment to customer satisfaction. Our goal is to provide high-quality living spaces while maintaining professional and responsive property management. Explore our services and find the perfect home with us.",
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "The apartment was built between 2015 and 2017 by the founder C.Moni and was officially opened, dedicated, and consecrated in 2018 by Rev Peter Mbao. We are proud of our history and dedication to providing a quality and affordable living experience.",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -90,16 +100,15 @@ fun AboutScreen(navController: NavHostController) {
                     Icon(
                         imageVector = Icons.Filled.Phone,
                         contentDescription = "Phone",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = Color.Blue,
                         modifier = Modifier.size(24.dp).padding(end = 8.dp)
                     )
                     Text(
                         text = "Call us: +254 700 000 000",
                         fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color.Blue
                     )
                 }
-
             }
         }
     )

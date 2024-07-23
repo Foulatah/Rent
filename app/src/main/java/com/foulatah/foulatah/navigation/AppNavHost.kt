@@ -23,7 +23,7 @@ import com.foulatah.foulatah.ui.tenants.UpdateBillsScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUTE_LOGIN
+    startDestination: String = ROUTE_HOME
 
 
 ) {

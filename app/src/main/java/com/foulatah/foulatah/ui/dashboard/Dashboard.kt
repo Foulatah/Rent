@@ -80,7 +80,7 @@ fun DashboardScreen(navController: NavHostController) {
                     Text(text = "Dashboard", color = Color.White, fontSize = 30.sp)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Gray,
+                    containerColor = Color.DarkGray,
                     titleContentColor = Color.White,
                 ),
                 navigationIcon = {
@@ -94,10 +94,10 @@ fun DashboardScreen(navController: NavHostController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.LightGray),
+                    .background(Color.White),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(80.dp))
 
                 val dashboardItems = listOf(
                     DashboardItemData(

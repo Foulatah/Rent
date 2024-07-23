@@ -2,8 +2,10 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,6 +31,9 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
     var paymentMethod by remember { mutableStateOf("") }
     var houseNumber by remember { mutableStateOf("") }
     var totalToBePaid by remember { mutableStateOf("") }
+    var cardNumber by remember { mutableStateOf("") }
+    var expiryDate by remember { mutableStateOf("") }
+    var cvv by remember { mutableStateOf("") }
 
     // Track if fields are empty
     var amountError by remember { mutableStateOf(false) }
@@ -36,6 +41,7 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
     var paymentMethodError by remember { mutableStateOf(false) }
     var houseNumberError by remember { mutableStateOf(false) }
     var totalToBePaidError by remember { mutableStateOf(false) }
+    var cardDetailsError by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -71,9 +77,10 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(90.dp))
 
                 TextField(
                     value = houseNumber,
@@ -85,7 +92,8 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
                         containerColor = Color.LightGray,
                         focusedIndicatorColor = Color.Gray,
                         unfocusedIndicatorColor = Color.Gray
-                    ),modifier = Modifier.fillMaxWidth()
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
                 if (houseNumberError) {
                     Text("House Number is required", color = Color.Red)
@@ -149,7 +157,7 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
                 TextField(
                     value = paymentMethod,
                     onValueChange = { paymentMethod = it },
-                    label = { Text("Payment Method") },
+                    label = { Text("Payment Method (M-Pesa, Equity, Co-operative, Family, I&M)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
                     colors = TextFieldDefaults.textFieldColors(
@@ -159,10 +167,59 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
                 if (paymentMethodError) {
                     Text("Payment Method is required", color = Color.Red)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (paymentMethod.lowercase() != "m-pesa") {
+                    TextField(
+                        value = cardNumber,
+                        onValueChange = { cardNumber = it },
+                        label = { Text("Card Number") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.LightGray,
+                            focusedIndicatorColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    TextField(
+                        value = expiryDate,
+                        onValueChange = { expiryDate = it },
+                        label = { Text("Expiry Date (MM/YY)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.LightGray,
+                            focusedIndicatorColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    TextField(
+                        value = cvv,
+                        onValueChange = { cvv = it },
+                        label = { Text("CVV") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardActions = KeyboardActions(onDone = { /* Handle Done action */ }),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.LightGray,
+                            focusedIndicatorColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.Gray
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (cardDetailsError) {
+                        Text("Card details are required for this payment method", color = Color.Red)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
                 Button(
@@ -173,9 +230,10 @@ fun PaymentScreen(navController: NavController, tenantId: () -> Unit) {
                         amountError = amount.isBlank()
                         paymentDateError = paymentDate.isBlank()
                         paymentMethodError = paymentMethod.isBlank()
+                        cardDetailsError = paymentMethod.lowercase() != "m-pesa" && (cardNumber.isBlank() || expiryDate.isBlank() || cvv.isBlank())
 
                         // Add payment if all fields are filled
-                        if (!houseNumberError && !totalToBePaidError && !amountError && !paymentDateError && !paymentMethodError) {
+                        if (!houseNumberError && !totalToBePaidError && !amountError && !paymentDateError && !paymentMethodError && !cardDetailsError) {
                             addPaymentToFirestore(
                                 navController,
                                 tenantId.toString(),

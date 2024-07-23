@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.foulatah.foulatah.navigation.ROUTE_DASHBOARD
 import com.foulatah.foulatah.navigation.ROUTE_HOME
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -67,7 +68,7 @@ fun ViewTenantScreen(navController: NavHostController, tenantId: () -> Unit) {
                     .windowInsetsPadding(WindowInsets.systemBars),
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigate(ROUTE_HOME)
+                        navController.navigate(ROUTE_DASHBOARD)
                     }) {
                         Icon(
                             Icons.Filled.ArrowBack,

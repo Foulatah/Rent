@@ -20,11 +20,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.foulatah.foulatah.R
 import kotlinx.coroutines.launch
 import com.foulatah.foulatah.navigation.ROUTE_ADD_TENANTS
 import com.foulatah.foulatah.navigation.ROUTE_DASHBOARD
@@ -78,6 +80,15 @@ fun HomeScreen(navController: NavHostController) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(text = "Pane Rentals")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /* Handle icon click */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.img), // Replace with your image resource
+                            contentDescription = null,
+
+                        )
+                    }
                 },
                 actions = {
                     IconButton(onClick = {
